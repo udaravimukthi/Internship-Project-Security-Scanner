@@ -1,0 +1,254 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Scanner - Kubernetes Cluster and Container Image</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container-fluid font-weight-bold">
+  <h4>Kubernetes Cluster and Container Image Security Scanner</h4>
+  <br/>
+  <div class="row">
+    <div class="col-5">
+      <div class="card">
+        <div class="card-header">
+          <h5>Cluster Runtime Analysis</h5>
+        </div>
+        <div class="card-body">
+          <form>
+            Falco
+            <input id="falcoTeamsWebhookURL" type="text" placeholder="Teams Webhook URL" size="40">
+            <button type="button" onclick="falcoDeploy()" class="btn btn-sm btn-warning font-weight-bold">Deploy</button>
+            <div id="falco"></div>
+          </form>
+          
+          <hr />
+          <form>
+            Sysdig
+            <select id="sysdigSelect">
+              <option disabled selected>Select and try sysdig commands</option>
+              <option value="sysdig%20-c%20topprocs_cpu">Proc CPU information</option>
+              <option value="sysdig%20-c%20topprocs_net">Proc Network Bytes</option>
+              <option value="sysdig%20-c%20spy_ip%20">Spy ip</option>
+              <option value="sysdig%20-c%20fileslower%201000">Read Files Slower than 1 second</option>
+              <option value="sysdig%20-c%20netstat">Network Connections</option>
+              <option value="sysdig%20-c%20httplog">HTTP requests</option>
+              <option value="sysdig%20-p%22%25user.name%29%20%25evt.arg.path%22%20%22evt.type%3Dchdir%22">Launched Programs</option>
+            </select>
+            <button type="button" onclick="sysdigScan()" class="btn btn-sm btn-secondary font-weight-bold">Scan</button> 
+            <br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            IP: <input id="sysdigIP" type="text">
+            <br />
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Capture Seconds: <input id="sysdigCaptureSeconds" value="15" type="text">
+          </form>
+            
+          <hr />
+          <form>
+            Sysdig Inspect
+            
+            <button type="button" onclick="sysdigInspect()" class="btn btn-sm btn-secondary font-weight-bold">Inspect</button>
+          </form>
+
+          <hr />
+          <form>
+            Csysdig
+            
+            <button type="button" onclick="csysdigScan()" class="btn btn-sm btn-secondary font-weight-bold">Scan</button>
+            <div id="csysdig"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-7">
+      <div class="card">
+        <div class="card-header">
+          <h5>Image Scan</h5>
+        </div>
+        <div class="card-body">
+          <form>
+            Trivy
+            <input id="trivyRegistryServer" type="text" name="username" placeholder="Username">
+            <input id="trivyRegistryPassword" type="text" name="password" placeholder="Password"><br/><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input id="trivyImageName" type="text" placeholder="Image Name">
+            <button type="button" onclick="trivyScan('')" class="btn btn-sm btn-secondary font-weight-bold">Scan</button>
+            <br/>
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input id="trivyNamespace" type="text" placeholder="Namespace">
+            <button type="button" onclick="fetchTrivyImages()" class="btn btn-sm btn-secondary font-weight-bold">Fetch Images from Cluster Namespace</button>
+            <div id="trivyImages"></div>
+          </form>
+          <hr />
+          
+          <form>
+            <div id="clairImage">
+              Clair
+              <button type="button" onclick="clairDeploy()" class="btn btn-sm btn-warning font-weight-bold">Deploy</button>
+              <button type="button" onclick="clairDeployWithPersistence()" class="btn btn-sm btn-warning font-weight-bold">Deploy with Persistence</button><br/><br/>
+              
+              <input id="clairRegistryServer" type="text" name="registry" placeholder="Docker registry"><br/><br/>
+              <input id="clairRegistryUsername" type="text" name="username" placeholder="Username">
+              <input id="clairRegistryPassword" type="text" name="password" placeholder="Password"><br/><br/>
+              <input id="clairRegistryImage" type="text" placeholder="Image Name">
+        
+              <button type="button" onclick="clairScan('')" class="btn btn-sm btn-secondary font-weight-bold">Scan</button>
+
+              <br/>
+              <br/>
+              <input id="clairNamespace" type="text" placeholder="Namespace">
+              <button type="button" onclick="fetchClairImages()" class="btn btn-sm btn-secondary font-weight-bold">Fetch Images from Cluster Namespace</button>
+              <div id="clairImages"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <br/>
+  <div class="card">
+    <div class="card-header">
+      <h5>Kubernetes Cluster Vunerability Scan and Benchmarking</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <form>
+            Kube-Hunter
+            <button type="button" onclick="kubeHunterScan()" class="btn btn-sm btn-secondary font-weight-bold">Scan</button>
+          </form> 
+        </div>
+        <div class="col">
+          <form>
+            Kube-Bench
+            <button type="button" onclick="kubeBenchScan()" class="btn btn-sm btn-secondary font-weight-bold">Scan</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" onclick="enablePersistence()" class="btn btn-sm btn-warning font-weight-bold">Enable Security Scanner Persistence</button><br/><br/>
+</div> 
+
+<script>
+  function sysdigScan() {
+    var scanSecondsValue = $('#sysdigCaptureSeconds').val();
+    var optionValue = $('#sysdigSelect option:selected').val();
+    if (optionValue.endsWith('spy_ip%20')){
+      optionValue = optionValue + $('#sysdigIP').val();
+    }
+    window.location = 'sysdigScan?scanseconds=' + scanSecondsValue + '&command=' + optionValue; 
+  }
+
+  function sysdigInspect() {
+    window.open(window.location.origin.replace('31100', '31101/#/capture/%2Fscanresults%2Fcapture.scap/views/overview'));
+  }
+
+  function trivyScan(image){
+    if(image == ""){
+      image = $('#trivyImageName').val() 
+    }
+    window.location='trivyScan?command=trivy%20--debug%20image%20' + image + 
+      '&registryUsername=' + $('#trivyRegistryServer').val() +
+      '&registryPassword=' + $('#trivyRegistryPassword').val();
+  }
+
+  function clairDeploy(){
+    window.location='clairDeploy';
+  }
+
+  function clairDeployWithPersistence(){
+    window.location='clairDeployWithPersistence';
+  }
+
+  function clairScan(image){
+    if(image == ""){
+      image = $('#clairRegistryImage').val()
+    }
+    window.location='clairScan?registryServer=' + $('#clairRegistryServer').val() + 
+      '&registryUsername=' + $('#clairRegistryUsername').val() +
+      '&registryPassword=' + $('#clairRegistryPassword').val() +
+      '&registryImage=' + image;
+
+  }
+
+  function csysdigScan(value){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("csysdig").innerHTML = "Run the following command<br/>" + this.responseText + "<br/>Then run 'csysdig' command";
+      }
+    };
+    xhttp.open("GET", "csysdigScan", true);
+    xhttp.send();
+  }
+
+  function kubeBenchScan(){
+    window.location='kubebenchScan'
+  }
+
+  function kubeHunterScan(){
+    window.location='kubehunterScan'
+  }
+
+  function falcoDeploy(value){
+    window.location='falcoDeploy?teamsWebhookURL=' + $('#falcoTeamsWebhookURL').val();
+
+  }
+
+  function fetchTrivyImages(value) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var images = this.responseText.split("\n");
+        var image;
+        var innerHtml = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Images fetched from Namespace:<br/>";
+        for (image of images) {
+          if(image != ""){
+            innerHtml = innerHtml + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+ image + '&nbsp;<button type="button" onclick="trivyScan(\'' + image + '\')" class="btn btn-sm btn-secondary font-weight-bold" style="padding: .15rem .5rem;">Scan</button><br/>'
+          }
+        }
+        document.getElementById("trivyImages").innerHTML = innerHtml;
+      }
+    };
+    xhttp.open("GET", "fetchimages?namespace=" + $('#trivyNamespace').val() , true);
+    xhttp.send();
+  }
+
+  function fetchClairImages(value) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var images = this.responseText.split("\n");
+        var image;
+        var innerHtml = "Images fetched from Namespace:<br/>";
+        for (image of images) {
+          if(image != ""){
+            innerHtml = innerHtml + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+ image + '&nbsp;<button type="button" onclick="clairScan(\'' + image + '\')" class="btn btn-sm btn-secondary font-weight-bold" style="padding: .15rem .5rem;">Scan</button><br/>'
+          }
+        }
+        document.getElementById("clairImages").innerHTML = innerHtml;
+      }
+    };
+    xhttp.open("GET", "fetchimages?namespace=" + $('#clairNamespace').val() , true);
+    xhttp.send();
+  }
+
+  function enablePersistence() {
+    window.location='enablePersistence';
+  }
+  </script>
+</body>
+</html>

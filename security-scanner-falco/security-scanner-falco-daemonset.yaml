@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: security-scanner-falco
+  namespace: security-scanner
+  labels:
+    app: security-scanner-falco
+spec:
+  selector:
+    matchLabels:
+      app: security-scanner-falco
+  template:
+    metadata:
+      labels:
+        app: security-scanner-falco
+    spec:
+      containers:
+        - name: security-scanner-falco
+          image: rnddockerdev.azurecr.io/ifs/security-scanner-falco
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2801
+          volumeMounts:
+          - mountPath: /host/dev         
+            name: dev-volume
+          - mountPath: /host/proc
+            name: proc-volume
+          - mountPath: /host/boot
+            name: boot-volume
+          - mountPath: /host/lib/modules
+            name: lib-volume
+          - mountPath: /host/usr
+            name: usr-volume
+          - mountPath: /host/etc
+            name: etc-volume
+          securityContext:
+            privileged: true
+      volumes:
+        - name: dev-volume
+          hostPath:
+            path: /dev
+        - name: proc-volume
+          hostPath:
+            path: /proc
+        - name: boot-volume
+          hostPath:
+            path: /boot
+        - name:  lib-volume
+          hostPath:
+            path: /lib/modules
+        - name: usr-volume
+          hostPath:
+            path: /usr 
+        - name: etc-volume
+          hostPath:
+            path: /etc 
+      imagePullSecrets:
+        - name: regcred 
+      serviceAccountName: security-scanner     
+

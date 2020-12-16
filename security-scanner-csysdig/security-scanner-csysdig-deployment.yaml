@@ -1,0 +1,54 @@
+
+apiVersion: apps/v1    
+kind: Deployment   
+metadata:
+  name: security-scanner-csysdig
+  namespace: security-scanner
+  labels:
+    app: security-scanner-csysdig
+spec:
+  selector:
+    matchLabels:
+      app: security-scanner-csysdig
+  template:
+    metadata:
+      labels:
+        app: security-scanner-csysdig
+    spec:
+      containers:
+        - name: security-scanner-csysdig
+          image: rnddockerdev.azurecr.io/ifs/security-scanner-csysdig
+          imagePullPolicy: Always
+          volumeMounts:
+          - mountPath: /host/dev         
+            name: dev-volume
+          - mountPath: /host/proc
+            name: proc-volume
+          - mountPath: /host/boot
+            name: boot-volume
+          - mountPath: /host/lib/modules
+            name: lib-volume
+          - mountPath: /host/usr
+            name: usr-volume
+          securityContext:
+            privileged: true
+      volumes:
+        - name: dev-volume
+          hostPath:
+            path: /dev
+        - name: proc-volume
+          hostPath:
+            path: /proc
+        - name: boot-volume
+          hostPath:
+            path: /boot
+        - name:  lib-volume
+          hostPath:
+            path: /lib/modules
+        - name: usr-volume
+          hostPath:
+            path: /usr 
+      imagePullSecrets:
+         - name: regcred  
+      serviceAccountName: security-scanner    
+

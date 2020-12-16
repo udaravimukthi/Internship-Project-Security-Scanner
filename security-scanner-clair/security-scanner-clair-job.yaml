@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: security-scanner-clair
+  namespace: security-scanner
+  labels:
+    app: security-scanner-clair
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: security-scanner-clair
+    spec:
+      containers:
+        - name: security-scanner-clair
+          image: rnddockerdev.azurecr.io/ifs/security-scanner-clair
+          imagePullPolicy: Always
+          env:
+          - name: REGISTRYSERVER
+            value: REGISTRYSERVER_PLACEHOLDER
+          - name: REGISTRYUSERNAME  
+            value: REGISTRYUSERNAME_PLACEHOLDER
+          - name: REGISTRYPASSWORD
+            value: REGISTRYPASSWORD_PLACEHOLDER
+          - name: REGISTRYIMAGE
+            value: REGISTRYIMAGE_PLACEHOLDER      
+          volumeMounts:
+          - name: dockersock
+            mountPath: "/var/run/docker.sock"
+          securityContext:
+            privileged: true 
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock  
+      imagePullSecrets:
+        - name: regcred 
+      serviceAccountName: security-scanner
+      restartPolicy: Never   

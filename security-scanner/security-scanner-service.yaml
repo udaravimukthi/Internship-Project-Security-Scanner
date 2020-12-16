@@ -1,0 +1,22 @@
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: security-scanner-svc
+  namespace: security-scanner
+spec:
+  type: LoadBalancer
+  selector: 
+    app: security-scanner
+  ports:
+    - name: security-scanner
+      protocol: TCP
+      port: 31100
+      targetPort: 8080
+      nodePort: 31100
+    - name: sysdig-inspect
+      protocol: TCP
+      port: 31101
+      targetPort: 3000
+      nodePort: 31101
+  

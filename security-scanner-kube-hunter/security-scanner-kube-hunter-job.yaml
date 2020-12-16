@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: security-scanner-kube-hunter
+  namespace: security-scanner
+spec:
+  template:
+    metadata:
+      labels:
+        app: security-scanner-kube-hunter
+    spec:
+      containers:
+      - name: security-scanner-kube-hunter
+        image: rnddockerdev.azurecr.io/ifs/security-scanner-kube-hunter
+        # command: ["kube-hunter"]
+        # args: ["--help"]
+        # args: ["--pod"]
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: regcred
+      serviceAccountName: security-scanner 
+  backoffLimit: 4

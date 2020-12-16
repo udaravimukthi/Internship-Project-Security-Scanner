@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: klar
+  namespace: security-scanner  #added
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        app: klar
+    spec:
+      containers:
+      - name: klar
+        image: leahnp/klar-scratch
+        imagePullPolicy: Always   #added
+        # args:
+        #   - "quay.io/samsung_cnct/fluentd-central:latest"
+        env:
+          - name: CLAIR_ADDR
+            value: http://clair-svc
+          - name: CLAIR_OUTPUT
+            value: "High"
+          - name: CLAIR_THRESHOLD
+            value: "10"
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Never
+      serviceAccountName: security-scanner
+  

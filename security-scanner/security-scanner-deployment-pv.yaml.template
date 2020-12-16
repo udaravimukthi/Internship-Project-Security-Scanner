@@ -1,0 +1,42 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-scanner
+  namespace: security-scanner
+  labels:
+    app: security-scanner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: security-scanner
+  template:
+    metadata:
+      labels:
+        app: security-scanner
+    spec:
+      containers:
+        - name: security-scanner
+          image: rnddockerdev.azurecr.io/ifs/security-scanner
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+          - mountPath: /scanresults
+            name: scanresults-volume
+        - name: sysdig-inspect
+          image: sysdig/sysdig-inspect:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 3000
+          volumeMounts:
+          - mountPath: /scanresults
+            name: scanresults-volume
+      volumes:
+        - name: scanresults-volume
+          persistentVolumeClaim:
+            claimName: security-scanner-pvc
+      imagePullSecrets:
+        - name: regcred    
+      serviceAccountName: security-scanner   

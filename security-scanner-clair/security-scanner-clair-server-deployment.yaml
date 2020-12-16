@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-scanner-clair-server
+  namespace: security-scanner
+  labels:
+    app: security-scanner-clair-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: security-scanner-clair-server
+  template:
+    metadata:
+      labels:
+        app: security-scanner-clair-server
+    spec:
+      containers:
+        - name: security-scanner-clair-server
+          image: rnddockerdev.azurecr.io/ifs/security-scanner-clair
+          imagePullPolicy: Always
+          env:
+          - name: INITIALIZE
+            value: "true"
+      imagePullSecrets:
+        - name: regcred 
+      serviceAccountName: security-scanner   
