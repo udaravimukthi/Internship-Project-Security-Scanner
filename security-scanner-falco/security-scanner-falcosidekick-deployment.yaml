@@ -22,9 +22,7 @@ spec:
         env:
         - name: TEAMS_WEBHOOKURL
           value: TEAMS_WEBHOOKURL_PLACEHOLDER
-        # - name: TEAMS_WEBHOOKURL 
-        #   value: https://outlook.office.com/webhook/5947fbc8-c107-4f45-ba28-aa1046c04cab@afadec18-0533-4cba-8578-5316252ff93f/IncomingWebhook/8f0327a0544a4544bcc2d0e4c1fe8a61/0001cd55-d556-4333-be38-c8921987ce57
-        - name: TEAMS_OUTPUTFORMAT
+       - name: TEAMS_OUTPUTFORMAT
           value: all
         - name: TEAMS_MINIMUMPRIORITY
           value: debug
