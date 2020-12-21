@@ -38,5 +38,5 @@ spec:
         name: scanresults-volume
       imagePullSecrets:
         - name: regcred    
-      serviceAccountName: security-scanner 
+      serviceAccountName: security-scanner
          
