@@ -39,4 +39,5 @@ spec:
             claimName: security-scanner-pvc
       imagePullSecrets:
         - name: regcred    
-      serviceAccountName: security-scanner 
+      serviceAccountName: security-scanner
+       
