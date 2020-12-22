@@ -5,5 +5,5 @@ kubectl apply -f ./
 ( cd ~ &&
 kubectl create secret generic regcred -n security-scanner \
     --from-file=.dockerconfigjson=.docker/config.json \
-    --type=kubernetes.io/dockerconfigjson )
+    --type=kubernetes.io/dockerconfigjson ) 
 
