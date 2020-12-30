@@ -2472,7 +2472,7 @@
     and not proc.cmdline startswith "gitjob --tekton-image rancher/tekton-utils:"
     and not proc.cmdline=rancher-operato
     and not (proc.cmdline=agent and fd.name contains "->")   
-    and not (proc.cmdline=webhook and fd.name contains "->")   
+    and not (proc.cmdline=webhook and fd.name contains "->")    
     and not (proc.cmdline="coredns -conf /etc/coredns/Corefile" and fd.name contains "->")
     and not (proc.cmdline="csi-attacher --v=5 --csi-address=/csi/csi.sock --leader-election --leader-election-namespace=longhorn-system" and fd.name contains "->")
     and not (proc.cmdline="csi-resizer --v=5 --csi-address=/csi/csi.sock --leader-election --leader-election-namespace=longhorn-system" and fd.name contains "->")
